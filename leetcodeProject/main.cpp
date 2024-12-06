@@ -11,6 +11,8 @@
 #include "LinkedListSection.hpp"
 #include "HashSection.hpp"
 #include "StringSection.hpp"
+#include "StackQueueSection.hpp"
+#include "BinaryTree/BinaryTreeBasic.hpp"
 #include "Node.hpp"
 #include "MyLinkedList.hpp"
 
@@ -288,6 +290,43 @@ void StringSectionTest(){
     std::cout << result << endl;
     
 }
+
+void StackSectionTest(){
+    StackQueueSection obj;
+    string s = "()[]{}";
+    string res = obj.isValid(s)? "true":"false";
+    std::cout << res << endl;
+    
+    //239
+    vector<int> a = {1,3,-1,-3,5,3,6,7};
+    int k = 3;
+    vector<int> result = obj.maxSlidingWindow(a, k);
+    for (size_t i = 0; i < result.size(); ++i) {
+            std::cout << result[i];
+            if (i != result.size() - 1) { // Si ce n'est pas le dernier élément
+                std::cout << ", ";
+            }
+        }
+    std::cout << endl;
+    
+    //347
+    vector<int> a1 = {1,1,1,2,2,3};
+    int k1 = 2;
+    vector<int> res347 = obj.topKFrequent(a1, k1);
+    for (size_t i = 0; i < res347.size(); ++i) {
+            std::cout << res347[i];
+            if (i != res347.size() - 1) { // Si ce n'est pas le dernier élément
+                std::cout << ", ";
+            }
+        }
+    std::cout << endl;
+    
+}
+void BinaryTreeSectionTest(){
+    //BinaryTreeBasic obj;
+    
+}
+
 int main(int argc, const char * argv[]) {
     // insert code here...
     //cout << "Hello, World!\n";
@@ -300,7 +339,13 @@ int main(int argc, const char * argv[]) {
     //哈希表
     //HashSectionTest();
     //字符串
-    StringSectionTest();
+    //StringSectionTest();
+    
+    //栈
+    //StackSectionTest();
+    
+    //Binary Tree
+    BinaryTreeSectionTest();
     
     return 0;
 }

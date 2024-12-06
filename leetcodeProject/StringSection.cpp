@@ -96,7 +96,7 @@ string StringSection::reverseWords(string s){
 //右旋字符串：将字符串截为2段，将这2段反转，2段字符串内部顺序不变
 //解法：1. 将字符串倒序 2.分段字符串中再反转
 string StringSection::reverseWordsbySection(string s,int k){
-    int len = static_cast<int>(s.size());
+    //int len = static_cast<int>(s.size());
     
     reverse(s.begin(),s.end());//整体反转
     reverse(s.begin(),s.begin() + k);//先反转前一段
