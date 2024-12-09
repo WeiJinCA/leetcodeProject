@@ -432,7 +432,7 @@ int DPBasic::rob(vector<int>& nums){
 }
 //213 环形房屋：分为是否包括首、末元素的数组，三种情况（不包括首末元素的数组）
 // 198的逻辑
-int robRange(vector<int>& nums, int start, int end) {
+int DPBasic::robRange(vector<int>& nums, int start, int end) {
         if (end == start) return nums[start];
         vector<int> dp(nums.size());
         dp[start] = nums[start];

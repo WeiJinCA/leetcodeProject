@@ -77,7 +77,7 @@ public:
     //26
     bool wordBreak(string s, vector<string>& wordDict);
     //27
-    int multiBags(vector<int>& nums,vector<int>& weight,vector<int>& value);//卡码网56
+    int multiBags(int bagWeight,int n, vector<int>& nums,vector<int>& weight,vector<int>& value);//卡码网56
     
     //29
     int rob(vector<int>& nums);//198

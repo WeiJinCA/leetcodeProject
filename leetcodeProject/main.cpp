@@ -15,6 +15,7 @@
 #include "BinaryTree/BinaryTreeBasic.hpp"
 #include "Node.hpp"
 #include "MyLinkedList.hpp"
+#include "Graph/GraphBasic.hpp"
 
 using namespace std;
 
@@ -327,6 +328,17 @@ void BinaryTreeSectionTest(){
     
 }
 
+void Graphtest(){
+    GraphBasic obj;
+    //797
+    //obj.includeInput797Matrix();
+    //obj.includeInput797List();
+    //obj.includeInputKama99Dfs();
+    //obj.includeInputKama99Bfs();
+    obj.includeInputKama101Dfs();
+    
+}
+
 int main(int argc, const char * argv[]) {
     // insert code here...
     //cout << "Hello, World!\n";
@@ -345,7 +357,10 @@ int main(int argc, const char * argv[]) {
     //StackSectionTest();
     
     //Binary Tree
-    BinaryTreeSectionTest();
+    //BinaryTreeSectionTest();
+    
+    //Graphtest
+    Graphtest();
     
     return 0;
 }
