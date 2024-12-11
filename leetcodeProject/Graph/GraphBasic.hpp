@@ -18,6 +18,33 @@
 //    深度优先dfs:沿一个方向搜，直到搜不下去了，然后回溯
 //    广度优先bfs：先把本节点的所有链接节点搜一遍，然后搜下一个节点；适合于解决两个点之间的最短路径问题
 
+//  查并集： 判断两个元素是否在同一个集合里；2个作用：1.将两个元素添加到一个集合中;2.判断两个元素在不在同一个集合
+//  解决的问题：连通性问题：元素在同一个集合中，即将三个元素连通在一起；用father[A] = B，father[B] = C表示
+//  路径压缩：return u == father[u] ? u : father[u] = find(father[u]);
+//  路径压缩：第2种方法：按秩(rank)合并；rank表示树的高度，即树中结点层次的最大值；
+//     两棵树的合并原则：rank小的树合并到rank大的树，保证合成的树rank最小（层次最少），降低在树上的查询路径长度
+
+//  最小生成树：所有节点的最小连通子图：以最小的成本（边的权值）将图中所有节点链接到一起
+//  边数量较少为稀疏图，接近或等于完全图（所有节点皆相连）为稠密图
+//  Prim算法：从节点的角度 采用贪心的策略 每次寻找距离 最小生成树最近的节点 并加入到最小生成树中。minDist数组 用来记录 每一个节点距离最小生成树的最近距离；可以负权值
+//  Kruskal算法:维护边的集合；如果求解题目中边少节点多，用kruskal算法比较好（稀疏图）
+
+//  拓扑排序：如打印文件依赖问题；
+//  拓扑排序：给出一个 有向图，把这个有向图转成线性的排序；
+//    要检测是否有环，如果存在循环依赖的情况，是不能做线性排序的；方法：当找不到入度为0的节点时，结果集中的节点小于总节点数，说明剩下的是环
+//    图论中判断有向无环图的常用方法
+//  节点的入度表示 有多少条边指向它，节点的出度表示有多少条边 从该节点出发。
+//  出发节点：优先找 入度为 0 的节点，只有入度为0，它才是出发节点
+//  步骤：1. 找到入度为0的节点，加入结果集；2.将该节点从图中移除；3. 循环步骤1和2，直到所有节点都被移除
+
+//  dijkstra算法：在有权图（权值非负数）中求从起点到其他节点的最短路径算法；和Prim类似，但不能有负权值
+//  dijkstra 算法可以同时求 起点到所有节点的最短路径；权值不能为负数
+//  minDist数组的含义：记录所有节点到源点的最短路径
+
+//  Bellman_ford算法： 允许权值为负
+//  核心思想是 对所有边进行松弛n-1次操作（n为节点数量），从而求得目标最短路
+//  放松：relax the edge：if (minDist[B] > minDist[A] + value) minDist[B] = minDist[A] + value
+//  采用了动态规划的思想，即：将一个问题分解成多个决策阶段，通过状态之间的递归关系最后计算出全局最优解。
 #ifndef GraphBasic_hpp
 #define GraphBasic_hpp
 
@@ -37,6 +64,32 @@ public:
     
     int dir[4][2] = {0, 1, 1, 0, -1, 0, 0, -1}; // 表示四个方向；左右上下
     int count;
+    
+    //并查集
+    int n = 1005; // n根据题目中节点数量而定，一般比节点数量大一点就好
+    vector<int> father = vector<int> (n, 0); // C++里的一种数组结构
+    vector<int> rank = vector<int> (n, 1); // 初始每棵树的高度都为1
+    
+    //20 Kama53
+    // l,r为 边两边的节点，val为边的数值
+    struct Edge {
+        int l, r, val;
+    };
+    
+    //23
+    struct Edge1 {
+        int to;  // 邻接顶点
+        int val; // 边的权重
+
+        Edge1(int t, int w): to(t), val(w) {}  // 构造函数
+    };
+    // 小顶堆
+    class mycomparison {
+    public:
+        bool operator()(const pair<int, int>& lhs, const pair<int, int>& rhs) {
+            return lhs.second > rhs.second;
+        }
+    };
     
     //3
     void includeInput797Matrix();
@@ -70,9 +123,49 @@ public:
     //11
     void includeInputKama104Dfs();
     void dfsKama104(vector<vector<int>>& grid, vector<vector<bool>>& visited, int x, int y, int mark) ;
-
+    //12
+    void includeInputKama110Bfs();
+    //13
+    void includeInputKama105Dfs1();
+    void dfs1Kama105(const vector<list<int>>& graph, int key, vector<bool>& visited) ;
+    void includeInputKama105Dfs2();
+    void dfs2Kama105(const vector<list<int>>& graph, int key, vector<bool>& visited) ;
+    void bfsKama105() ;
+    //14
+    void includeInputKama106_1();
+    void includeInputKama106_2();
+    //15并查集
+    // 并查集初始化
+    void init() ;
+    // 并查集里寻根的过程
+    int find(int u) ;
+    // 判断 u 和 v是否找到同一个根
+    bool isSame(int u, int v);
+    // 将v->u 这条边加入并查集
+    void join(int u, int v);
     
-    
+    //16
+    void includeInputKama107();//
+    //17
+    void includeInputKama108();
+    //18
+    void includeInputKama109();
+    void getRemoveEdge(const vector<vector<int>>& edges);
+    bool isTreeAfterRemoveEdge(const vector<vector<int>>& edges, int deleteEdge);
+    //19
+    void includeInputKama53Prim();
+    //20
+    void includeInputKama53Kruskal();
+    //21
+    void includeInputKama117();
+    //22
+    void includeInputKama47();
+    //23
+    void includeInputKama47_v2();
+    //24
+    void includeInputKama94();
+    //25
+    void includeInputKama94_v2();
     
     
 };
