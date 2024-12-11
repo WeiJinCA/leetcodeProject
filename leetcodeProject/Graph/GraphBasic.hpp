@@ -52,6 +52,7 @@
 #include <vector>
 #include <unordered_map>
 #include <list>
+#include <queue>
 
 using namespace std;
 
@@ -90,6 +91,24 @@ public:
             return lhs.second > rhs.second;
         }
     };
+    
+    //Kama126
+    int moves[1001][1001];
+    int dir1[8][2]={-2,-1,-2,1,-1,2,1,2,2,1,2,-1,1,-2,-1,-2};
+    int b1, b2;
+    // F = G + H
+    // G = 从起点到该节点路径消耗
+    // H = 该节点到终点的预估消耗
+
+    struct Knight{
+        int x,y;
+        int g,h,f;
+        bool operator < (const Knight & k) const{  // 重载运算符， 从小到大排序
+         return k.f < f;
+        }
+    };
+
+    priority_queue<Knight> que;
     
     //3
     void includeInput797Matrix();
@@ -166,7 +185,19 @@ public:
     void includeInputKama94();
     //25
     void includeInputKama94_v2();
-    
+    //26
+    void includeInputKama95();
+    void includeInputKama95_SPFA();
+    //27
+    void includeInputKama96();
+    void includeInputKama96_SPFA();
+    //28 Floyd 算法
+    void includeInputKama97();
+    void includeInputKama97_2D();
+    //29 A star算法
+    void includeInputKama126();
+    int  Heuristic(const Knight& k);//欧拉距离
+    void astar(const Knight& k);
     
 };
 

@@ -1071,7 +1071,7 @@ void GraphBasic::includeInputKama117(){
         cout << result[n - 1];
     } else cout << -1 << endl;
 }
-//Kama47: 从起点到终点，用时最短的路径
+//Kama47: 从起点到终点，用时最短的路径：Dijkstra
 //步骤：1.选源点到哪个节点近且该节点未被访问过 2. 该最近节点被标记访问过 3.更新非访问节点到源点的距离（即更新minDist数组）
 //时间和空间复杂度：n^2
 //和Prim算法的区别：prim是求 非访问节点到最小生成树的最小距离，而 dijkstra是求 非访问节点到源点的最小距离
@@ -1194,7 +1194,7 @@ void GraphBasic::includeInputKama47_v2(){
             if (minDist[end] == INT_MAX) cout << -1 << endl; // 不能到达终点
             else cout << minDist[end] << endl; // 到达终点最短路径
 }
-//Kama94:
+//Kama94: 城市间货物运输:负权值最低权值路径
 //minDist数组来表达 起点到各个节点的最短距离
 //对所有边松弛一次，相当于计算 起点到达 与起点一条边相连的节点 的最短距离;
 //对所有边松弛n-1次，相当于计算 起点到达 与起点n-1条边相连的节点 的最短距离,即到达终点的松弛次数;
@@ -1235,7 +1235,368 @@ void GraphBasic::includeInputKama94(){
     if (minDist[end] == INT_MAX) cout << "unconnected" << endl; // 不能到达终点
     else cout << minDist[end] << endl; // 到达终点最短路径
 }
+//Kama94:城市间货物运输:负权值最低权值路径
 //Bellman_ford 队列优化算法Queue improved Bellman-Ford（又名SPFA:Shortest Path Faster Algorithm）
+//Bellman_ford 算法 每次都是对所有边进行松弛，其实是多做了一些无用功；只需对上一次松弛时候更新过的节点作为出发点所连接的边 进行松弛
+//方法：使用队列记录上次松弛的时候更新过的节点
+//用visited数组记录已经在队列里的元素，已经在队列的元素不用重复加入
+//图越稀疏，SPFA的效率就越高;越密越接近Bellman_ford（O(N * E) N 为节点数量，E为边的数量）
+//一般来说，SPFA 的时间复杂度为 O(K * N) K 为不定值，因为 节点需要计入几次队列取决于 图的稠密度
 void GraphBasic::includeInputKama94_v2(){
+    int n,m,p1,p2,val;
+    cin >> n >> m;
     
+    vector<list<Edge1>> grid(n+1);
+    
+    vector<bool> isInQueue(n+1);//已经在过队列的节点不可以重复添加
+    
+    //将所有边保存起来
+    for (int i =0; i < m; i++) {
+        cin >> p1 >> p2 >> val;
+        // p1 指向 p2，权值为 val
+        grid[p1].push_back(Edge1(p2, val));
+    }
+    
+    int start = 1;//起点
+    int end = n;//终点
+    
+    vector<int> minDist(n+1,INT_MAX);
+    minDist[start] = 0;
+    
+    queue<int> que;
+    que.push(start);
+    
+    while(!que.empty()){
+        int node = que.front();que.pop();
+        isInQueue[node] = false; // 从队列里取出的时候，要取消标记，我们只保证已经在队列里的元素不用重复加入
+        for (Edge1 edge : grid[node]) {
+            int from = node;
+            int to = edge.to;
+            int value = edge.val;
+            if(minDist[to] > minDist[from] + value){
+                minDist[to] = minDist[from] + value;
+                if (isInQueue[to] == false) { // 已经在队列里的元素不用重复添加
+                    //当minDist数组不在变化时，就没有新节点加入队列，循环结束
+                    que.push(to);
+                    isInQueue[to] = true;
+                }
+            }
+        }
+    }
+        if (minDist[end] == INT_MAX) cout << "unconnected" << endl; // 不能到达终点
+            else cout << minDist[end] << endl; // 到达终点最短路径
+}
+//Kama95:城市货物运输：带负权值回路
+//负权回路是指一系列道路的总权值为负，这样的回路使得通过反复经过回路中的道路，理论上可以无限地减少总成本或无限地增加总收益
+//用 bellman_ford 算法来判断 负权回路：松弛n次以上，minDist有变化，说明有负权回路
+void GraphBasic::includeInputKama95(){
+    int n, m, p1, p2, val;
+    cin >> n >> m;
+
+    vector<vector<int>> grid;
+
+    // 将所有边保存起来
+    for(int i = 0; i < m; i++){
+            cin >> p1 >> p2 >> val;
+            // p1 指向 p2，权值为 val
+            grid.push_back({p1, p2, val});
+
+    }
+    int start = 1;  // 起点
+    int end = n;    // 终点
+
+    vector<int> minDist(n + 1 , INT_MAX);
+    minDist[start] = 0;
+    bool flag = false;
+    
+    for(int i = 0; i <= n;i++){// 这里我们松弛n次，最后一次判断负权回路
+        for(vector<int> &side : grid){// 每一次松弛，都是对所有边进行松弛
+            int from = side[0]; // 边的出发点
+            int to = side[1]; // 边的到达点
+            int price = side[2]; // 边的权值
+            // 松弛操作
+            // minDist[from] != INT_MAX 防止从未计算过的节点出发
+            if(i < n){
+                if (minDist[from] != INT_MAX && minDist[to] > minDist[from] + price) {
+                    minDist[to] = minDist[from] + price;
+                }
+            }else{// 多加一次松弛判断负权回路
+                if (minDist[from] != INT_MAX && minDist[to] > minDist[from] + price) flag = true;
+            }
+        }
+    }
+    
+    if (flag) cout << "circle" << endl;
+    else if (minDist[end] == INT_MAX) cout << "unconnected" << endl; // 不能到达终点
+    else cout << minDist[end] << endl; // 到达终点最短路径
+}
+//对于SPFA算法，在极端情况下，即：所有节点都与其他节点相连，每个节点的入度为 n-1 （n为节点数量），所以每个节点最多加入 n-1 次队列
+//所以如果节点加入队列的次数超过n-1次，那么就一定有负权回路
+void GraphBasic::includeInputKama95_SPFA(){
+    int n,m,p1,p2,val;
+    cin >> n >> m;
+    
+    vector<list<Edge1>> grid(n+1);//邻接表
+    
+    vector<bool> isInQueue(n+1);//已经在过队列的节点不可以重复添加
+    
+    //将所有边保存起来
+    for (int i =0; i < m; i++) {
+        cin >> p1 >> p2 >> val;
+        // p1 指向 p2，权值为 val
+        grid[p1].push_back(Edge1(p2, val));
+    }
+    
+    int start = 1;//起点
+    int end = n;//终点
+    
+    vector<int> minDist(n+1,INT_MAX);
+    minDist[start] = 0;
+    
+    queue<int> que;
+    que.push(start);
+    
+    vector<int> count(n+1, 0); // 记录节点加入队列几次
+    count[start]++;
+    
+    bool flag = false;
+    while(!que.empty()){
+        int node = que.front();que.pop();
+        isInQueue[node] = false; // 从队列里取出的时候，要取消标记，我们只保证已经在队列里的元素不用重复加入
+        for (Edge1 edge : grid[node]) {
+            int from = node;
+            int to = edge.to;
+            int value = edge.val;
+            if(minDist[to] > minDist[from] + value){
+                minDist[to] = minDist[from] + value;
+                que.push(to);
+                count[to]++;
+                if(count[to] == n){// 如果加入队列次数超过 n-1次 就说明该图与负权回路
+                    flag = true;
+                    while(!que.empty()) que.pop();
+                    break;
+                }
+               
+            }
+        }
+    }
+    if (flag) cout << "circle" << endl;
+    else if (minDist[end] == INT_MAX) cout << "unconnected" << endl; // 不能到达终点
+    else cout << minDist[end] << endl; // 到达终点最短路径
+}
+//Kama96:单源有限最短路：最多经过k个城市，从起始城市到目的地的最低运输成本（最短路径）
+//起点最多经过k + 1 条边到达终点的最短距离：只需松弛k+1次
+//当节点中包含负权回路时，每次更新都会更新所有minDist的值，所以要用minDist_copy数组来记录上一次更新完的数组，用于本次计算
+void GraphBasic::includeInputKama96(){
+    int src, dst,k ,n, m, p1, p2, val;
+    cin >> n >> m;
+
+    vector<vector<int>> grid;
+
+    // 将所有边保存起来
+    for(int i = 0; i < m; i++){
+            cin >> p1 >> p2 >> val;
+            // p1 指向 p2，权值为 val
+            grid.push_back({p1, p2, val});
+
+    }
+    
+    cin >> src >> dst >>k;
+
+    vector<int> minDist(n + 1 , INT_MAX);
+    minDist[src] = 0;
+    vector<int> minDist_copy(n + 1); // 用来记录上一次遍历的结果
+    
+    for(int i = 1; i <= k + 1 ;i++){// 对所有边 松弛 k + 1 次
+        minDist_copy = minDist; // 获取上一次计算的结果
+        for(vector<int> &side : grid){// 每一次松弛，都是对所有边进行松弛
+            int from = side[0]; // 边的出发点
+            int to = side[1]; // 边的到达点
+            int price = side[2]; // 边的权值
+            // 松弛操作
+            // minDist[from] != INT_MAX 防止从未计算过的节点出发
+            // 注意使用 minDist_copy 来计算 minDist
+            if (minDist_copy[from] != INT_MAX && minDist[to] > minDist_copy[from] + price) {
+                minDist[to] = minDist_copy[from] + price;
+            }
+        }
+    }
+    
+    if (minDist[dst] == INT_MAX) cout << "unconnected" << endl; // 不能到达终点
+    else cout << minDist[dst] << endl; // 到达终点最短路径
+}
+//使用SPFA，由于进出栈的耗时比较高，所以不一定效率高
+void GraphBasic::includeInputKama96_SPFA(){
+    int n,m,p1,p2,val;
+    cin >> n >> m;
+    
+    vector<list<Edge1>> grid(n+1);//邻接表
+    
+    //将所有边保存起来
+    for (int i =0; i < m; i++) {
+        cin >> p1 >> p2 >> val;
+        // p1 指向 p2，权值为 val
+        grid[p1].push_back(Edge1(p2, val));
+    }
+    int start, end, k;
+    cin >> start >> end >> k;
+
+    k++;
+    
+    vector<int> minDist(n+1,INT_MAX);
+    vector<int> minDist_copy(n + 1); // 用来记录每一次遍历的结果
+    minDist[start] = 0;
+    
+    queue<int> que;
+    que.push(start);
+    
+    int que_size;
+    
+    while(k-- && !que.empty()){
+        vector<bool> visited(n + 1, false); // 每一轮松弛中，控制节点不用重复入队列
+        minDist_copy = minDist;
+        que_size = static_cast<int>(que.size()) ;
+        while (que_size--) {
+            int node = que.front();que.pop();
+            
+            for (Edge1 edge : grid[node]) {
+                int from = node;
+                int to = edge.to;
+                int value = edge.val;
+                if(minDist[to] > minDist[from] + value){
+                    minDist[to] = minDist[from] + value;
+                    
+                    if(visited[to])continue;// 不用重复放入队列，但需要重复松弛，所以放在这里位置
+                    visited[to] = true;
+                    que.push(to);
+                    
+                    
+                }
+            }
+        }
+    }
+    
+    if (minDist[end] == INT_MAX) cout << "unconnected" << endl; // 不能到达终点
+    else cout << minDist[end] << endl; // 到达终点最短路径
+}
+//Kama97 逛公园：多源最短路问题：求多个起点到多个终点的多条最短路径
+//Floyd算法：可以处理权值为负的情况；核心是动态规划;时间复杂度相对较高，适合 稠密图且源点较多的情况
+//grid[i][j][k] = m，表示 节点i 到 节点j 以[1...k] 集合为中间节点的最短距离为m
+//时间复杂度： O(n^3);空间复杂度：O(n^2)
+void GraphBasic::includeInputKama97(){
+    int n, m, p1, p2, val;
+    cin >> n >> m;
+    
+    vector<vector<vector<int>>> grid(n+1,vector<vector<int>>(n+1,vector<int>(n+1,10005)));// 因为边的最大距离是10^4
+    for(int i = 0; i < m; i++){
+            cin >> p1 >> p2 >> val;
+            grid[p1][p2][0] = val;
+            grid[p2][p1][0] = val; // 注意这里是双向图
+
+    }
+    
+    //Floyd：k为中间节点集合的个数；当k遍历到n时，即完成整个地图的计算
+    for (int k = 1; k <= n; k++) {
+            for (int i = 1; i <= n; i++) {
+                for (int j = 1; j <= n; j++) {
+                    grid[i][j][k] = min(grid[i][j][k-1], grid[i][k][k-1] + grid[k][j][k-1]);//递推公式
+                }
+            }
+    }
+    
+    //输出结果
+    int z, start, end;
+    cin >> z;
+    while (z--) {
+            cin >> start >> end;
+            if (grid[start][end][n] == 10005) cout << -1 << endl;
+            else cout << grid[start][end][n] << endl;
+    }
+}
+//使用二维数组，因为k的状态仅依赖于k-1
+void GraphBasic::includeInputKama97_2D(){
+    int n, m, p1, p2, val;
+    cin >> n >> m;
+    
+    vector<vector<int>> grid(n+1,vector<int>(n+1,10005));// 因为边的最大距离是10^4
+    for(int i = 0; i < m; i++){
+            cin >> p1 >> p2 >> val;
+            grid[p1][p2] = val;
+            grid[p2][p1] = val; // 注意这里是双向图
+
+    }
+    
+    //Floyd：k为中间节点集合的个数；当k遍历到n时，即完成整个地图的计算
+    for (int k = 1; k <= n; k++) {
+            for (int i = 1; i <= n; i++) {
+                for (int j = 1; j <= n; j++) {
+                    grid[i][j] = min(grid[i][j], grid[i][k] + grid[k][j]);//递推公式
+                }
+            }
+    }
+    
+    //输出结果
+    int z, start, end;
+    cin >> z;
+    while (z--) {
+            cin >> start >> end;
+            if (grid[start][end] == 10005) cout << -1 << endl;
+            else cout << grid[start][end] << endl;
+    }
+}
+
+//Astar 关键在于 启发式函数， 也就是 影响 广搜或者 dijkstra 从 容器（队列）里取元素的优先顺序；不适合多个目标找最短路径
+//启发式函数 要影响的就是队列里元素的排序
+//F = G + H; G：起点达到目前遍历节点的距离; H：目前遍历的节点到达终点的距离; 起点达到目前遍历节点的距离 + 目前遍历的节点到达终点的距离 就是起点到达终点的距离。
+//使用队列，保证每次弹出的是F最小的，即保证搜索方向是朝着目标去的
+//计算两点距离的方式：每种方式会导致结果不同
+//1.曼哈顿距离，计算方式： d = abs(x1-x2)+abs(y1-y2)
+//2.欧氏距离（欧拉距离） ，计算方式：d = sqrt( (x1-x2)^2 + (y1-y2)^2 )
+//3.切比雪夫距离，计算方式：d = max(abs(x1 - x2), abs(y1 - y2))
+//x1, x2 为起点坐标，y1, y2 为终点坐标 ，abs 为求绝对值，sqrt 为求开根号，
+//最坏情况下，A * 退化成广搜，算法的时间复杂度 是 O(n * 2)，n 为节点数量。最佳情况，是从起点直接到终点，时间复杂度为 O(dlogd)，d 为起点到终点的深度。
+//因为在搜索的过程中也需要堆排序，所以是 O(dlogd)。
+//效率高，但结果不唯一，也可能是次短路径，适合工程应用，不适合算法题
+void GraphBasic::includeInputKama126(){
+    int n,a1,a2;
+    cin >> n;
+    while(n--){
+        cin >> a1 >> a2 >> b1 >> b2;
+        memset(moves,0,sizeof(moves));
+        Knight start;
+        start.x = a1;
+        start.y = a2;
+        start.g = 0;
+        start.h = Heuristic(start);
+        start.f = start.g + start.h;
+        astar(start);
+        while(!que.empty()) que.pop(); // 队列清空
+        cout << moves[b1][b2] << endl;
+    }
+}
+int GraphBasic::Heuristic(const Knight& k) { // 欧拉距离
+    return (k.x - b1) * (k.x - b1) + (k.y - b2) * (k.y - b2); // 统一不开根号，这样可以提高精度
+}
+void GraphBasic::astar(const Knight& k){
+    Knight cur,next;
+    que.push(k);
+    while(!que.empty()){
+        cur = que.top();que.pop();
+        if(cur.x == b1 && cur.y == b2) break;
+        
+        for (int i = 0; i < 8; i++) {
+            next.x = cur.x + dir[i][0];
+            next.y = cur.y + dir[i][1];
+            if(next.x < 1 || next.x > 1000 || next.y < 1 || next.y > 1000)continue;
+            if(!moves[next.x][next.y]){
+                moves[next.x][next.y] = moves[cur.x][cur.y] + 1;
+                
+                //开始计算F
+                next.g = cur.g + 5;// 统一不开根号，这样可以提高精度，马走日，1 * 1 + 2 * 2 = 5
+                next.h = Heuristic(next);
+                next.f = next.g + next.h;
+                que.push(next);//将可能的下一个格子加入队列，利用自动排序，下一次去目标方向的点走
+            }
+        }
+    }
 }
