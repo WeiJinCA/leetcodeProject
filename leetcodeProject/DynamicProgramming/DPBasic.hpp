@@ -130,6 +130,9 @@ public:
     int extend(const string& s, int i, int j, int n);
     //53
     int longestPalindromeSubseq(string s);//516
+    string longestPalindrome5(string s);//5
+    int minCut132(string s);//132
+    int findNumberOfLIS673(vector<int>& nums);//673 //300的升级版
     
     
 };

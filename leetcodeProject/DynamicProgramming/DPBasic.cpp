@@ -824,3 +824,80 @@ int DPBasic::longestPalindromeSubseq(string s){
             }
             return dp[0][length - 1];
 }
+//最长回文子串：找字符串s中的最长的回文子串
+//动态规划思路：布尔类型的dp[i][j]：表示区间范围[i,j] （注意是左闭右闭）的子串是否是回文子串，如果是dp[i][j]为true，否则为false
+string DPBasic::longestPalindrome5(string s){
+    vector<vector<int>> dp(s.size(), vector<int>(s.size(), 0));
+    int maxlenth = 0;
+            int left = 0;
+            int right = 0;
+    for (int i = static_cast<int>(s.size()) - 1; i >= 0; i--) {
+                for (int j = i; j < s.size(); j++) {
+                    if (s[i] == s[j] && (j - i <= 1 || dp[i + 1][j - 1])) {
+                        dp[i][j] = true;
+                    }
+                    if (dp[i][j] && j - i + 1 > maxlenth) {
+                        maxlenth = j - i + 1;
+                        left = i;
+                        right = j;
+                    }
+                }
+            }
+            return s.substr(left, maxlenth);
+}
+//132 分割回文串：分割字符串使得每个子串都是回文；返回最少分割次数
+//dp[i]：范围是[0, i]的回文子串，最少分割次数是dp[i]
+//递推公式：dp[i] = min(dp[i], dp[j] + 1)：当分割点为j时，分割后，区间[j + 1, i]是回文子串，那么dp[i] 就等于 dp[j] + 1
+int DPBasic::minCut132(string s){
+    vector<vector<bool>> isPalindromic(s.size(), vector<bool>(s.size(), false));
+    for (int i = static_cast<int>(s.size()) - 1; i >= 0; i--) {
+                for (int j = i; j < s.size(); j++) {
+                    if (s[i] == s[j] && (j - i <= 1 || isPalindromic[i + 1][j - 1])) {
+                        isPalindromic[i][j] = true;
+                    }
+                }
+            }
+            // 初始化
+            vector<int> dp(s.size(), 0);
+            for (int i = 0; i < s.size(); i++) dp[i] = i;//dp[i]的最大值是i,即将每个字符都分割出来
+
+            for (int i = 1; i < s.size(); i++) {
+                if (isPalindromic[0][i]) {
+                    dp[i] = 0;
+                    continue;
+                }
+                for (int j = 0; j < i; j++) {
+                    if (isPalindromic[j + 1][i]) {
+                        dp[i] = min(dp[i], dp[j] + 1);
+                    }
+                }
+            }
+            return dp[s.size() - 1];
+}
+//673 //300的升级版：给定一个未排序的整数数组，找到最长递增子序列的个数
+//dp[i]：i之前（包括i）最长递增子序列的长度为dp[i]
+//count[i]：以nums[i]为结尾的字符串，最长递增子序列的个数为count[i]
+int DPBasic::findNumberOfLIS673(vector<int>& nums){
+    if (nums.size() <= 1) return static_cast<int>(nums.size());
+            vector<int> dp(nums.size(), 1);
+            vector<int> count(nums.size(), 1);
+            int maxCount = 0;
+            for (int i = 1; i < nums.size(); i++) {
+                for (int j = 0; j < i; j++) {
+                    if (nums[i] > nums[j]) {
+                        if (dp[j] + 1 > dp[i]) {//说明找到了更长的最长子序列
+                            dp[i] = dp[j] + 1;
+                            count[i] = count[j];//更新最长子序列的个数
+                        } else if (dp[j] + 1 == dp[i]) {//最长子序列的长度相同
+                            count[i] += count[j];//要把个数加进去
+                        }
+                    }
+                    if (dp[i] > maxCount) maxCount = dp[i];
+                }
+            }
+            int result = 0;
+            for (int i = 0; i < nums.size(); i++) {
+                if (maxCount == dp[i]) result += count[i];//只要是长度等于maxCount的，其个数都要加入结果中
+            }
+            return result;
+}
