@@ -57,7 +57,9 @@
 using namespace std;
 
 class GraphBasic {
-    
+private:
+    static  int bitCount1356(int n);
+    static  bool cmp1356(int a, int b);
 public:
     //797
     vector<vector<int>> result; // 收集符合条件的路径
@@ -198,6 +200,18 @@ public:
     void includeInputKama126();
     int  Heuristic(const Knight& k);//欧拉距离
     void astar(const Knight& k);
+    
+    //额外题目
+    bool canVisitAllRoomsByDfs(vector<vector<int>>& rooms);//841
+    void dfs841(const vector<vector<int>>& rooms, int key, vector<bool>& visited);
+    bool canVisitAllRoomsByBfs(vector<vector<int>>& rooms);//841
+    int ladderLength127(string beginWord, string endWord, vector<string>& wordList);//127
+    vector<int> findRedundantConnection684(vector<vector<int>>& edges);//684
+    vector<int> findRedundantConnection685(vector<vector<int>>& edges);//685 类似kama109
+    //非图题目
+    bool judgeCircle657(string moves);
+    void nextPermutation31(vector<int>& nums);//31
+    vector<int> sortByBits1356(vector<int>& arr) ;//1356
     
 };
 

@@ -861,7 +861,7 @@ void GraphBasic::includeInputKama109(){
         edges.push_back({s,t});
     }
     
-    vector<int> vec; // 记录入度为2的边（如果有的话就两条边）
+    vector<int> vec; // 记录入度为2的节点（如果有的话就两条边）
         // 找入度为2的节点所对应的边，注意要倒序，因为优先删除最后出现的一条边
         for (int i = n - 1; i >= 0; i--) {
             if (inDegree[edges[i][1]] == 2) {
@@ -1599,4 +1599,153 @@ void GraphBasic::astar(const Knight& k){
             }
         }
     }
+}
+//841 有向图，不能用查并集
+//深搜2种写法：此处用处理当前访问节点
+bool GraphBasic::canVisitAllRoomsByDfs(vector<vector<int>>& rooms){
+    vector<bool> visited(rooms.size(), false);
+    dfs841(rooms, 0, visited);
+            //检查是否都访问到了
+            for (int i : visited) {
+                if (i == false) return false;
+            }
+            return true;
+}
+void GraphBasic::dfs841(const vector<vector<int>>& rooms, int key, vector<bool>& visited){
+    if(visited[key]) return;
+    
+    visited[key] = true;
+    vector<int> keys = rooms[key];
+    for(int key : keys){
+        // 深度优先搜索遍历
+        dfs841(rooms, key, visited);
+    }
+}
+//广搜
+bool GraphBasic::canVisitAllRoomsByBfs(vector<vector<int>>& rooms){
+    vector<int> visited(rooms.size(), 0); // 标记房间是否被访问过
+    visited[0] = 1; //  0 号房间开始
+    queue<int> que;
+    que.push(0); //  0 号房间开始
+
+    // 广度优先搜索的过程
+    while (!que.empty()) {
+        int key = que.front();que.pop();
+        vector<int> keys = rooms[key];
+        for(int key:keys){
+            que.push(key);
+            visited[key] = 1;
+        }
+    }
+    
+    for(int i:visited){
+        if(i == 0)return false;
+    }
+    return true;
+}
+//127 单词接龙：每次只能改变一个字符，从List首词开始变换，变换中间的单词必须在list种，求最少的变换次数为结尾的单词
+int GraphBasic::ladderLength127(string beginWord, string endWord, vector<string>& wordList){
+    // 将vector转成unordered_set，提高查询速度
+    unordered_set<string> wordSet(wordList.begin(), wordList.end());
+    // 如果endWord没有在wordSet出现，直接返回0
+    if (wordSet.find(endWord) == wordSet.end()) return 0;
+    // 记录word是否访问过
+    unordered_map<string, int> visitMap; // <word, 查询到这个word路径长度>
+    // 初始化队列
+    queue<string> que;
+    que.push(beginWord);
+    // 初始化visitMap
+    visitMap.insert(pair<string, int>(beginWord, 1));
+    
+    while(!que.empty()){
+        string word = que.front();
+        que.pop();
+        int path = visitMap[word];// 这个word的路径长度
+        for (int i = 0; i < word.size(); i++) {// 用一个新单词替换word，因为每次置换一个字母
+            string newWord = word; // 用一个新单词替换word，因为每次置换一个字母
+            for (int j = 0 ; j < 26; j++) {
+                newWord = j + 'a';
+                if(newWord == endWord) return path + 1;//找到了
+                // wordSet出现了newWord，并且newWord没有被访问过
+                if(wordSet.find(newWord) != wordSet.end() && visitMap.find(newWord) == visitMap.end()){
+                    //添加访问信息
+                    visitMap.insert(pair<string, int>(newWord,path+1));
+                    que.push(newWord);
+                }
+            }
+            
+            }
+        }
+        
+        return 0;
+    }
+//684
+vector<int> GraphBasic::findRedundantConnection684(vector<vector<int>>& edges){
+        init();//初始化并查集
+        for (int i = 0 ; i < edges.size(); i++) {
+            if(isSame(edges[i][0], edges[i][1]))//判断一下边的两个节点在不在同一个集合
+                return edges[i];
+            else join(edges[i][0], edges[i][1]);
+        }
+        return {};
+}
+//685 有向图：类似kama109
+//题目：图原本是是一棵树，只不过在不增加节点的情况下多加了一条边；
+//情况1:说明只有一条边的入度为2； 情况2:没有入度为2的节点，但有环
+vector<int> GraphBasic::findRedundantConnection685(vector<vector<int>>& edges){
+        init();//初始化并查集
+        for (int i = 0 ; i < edges.size(); i++) {
+            if(isSame(edges[i][0], edges[i][1]))//判断一下边的两个节点在不在同一个集合
+                return edges[i];
+            else join(edges[i][0], edges[i][1]);
+        }
+        return {};
+}
+//657 机器人从(0,0)出发，上下左右移动，看是否会返回原点
+//思路：统计x,y向上的移动距离，最后如果都为0，则说明回到原点
+bool GraphBasic::judgeCircle657(string moves){
+    int x = 0, y = 0;
+    for (int i = 0; i < moves.size(); i++) {
+        if(moves[i] == 'U') y++;
+        if(moves[i] == 'D') y--;
+        if(moves[i] == 'L') x--;
+        if(moves[i] == 'R') x++;
+    }
+    if(x == 0 && y ==0 ) return true;
+    return false;
+}
+//31 返回数字序列的下一个更大的排序
+//思路：从后向前遍历，发现nums[j] > nums[i], 进行交换；对i+1到数据结束的区间进行排序
+void GraphBasic::nextPermutation31(vector<int>& nums){
+    int length = static_cast<int>(nums.size());
+    for (int i = length - 1; i >= 0; i--) {
+        for(int j = length - 1; j > i; j--){
+            if(nums[j] > nums[i]){
+                swap(nums[j] , nums[i]);
+                reverse(nums.begin() + i + 1, nums.end());
+                return;
+            }
+        }
+    }
+    // 到这里了说明整个数组都是倒序了，反转一下便可
+    reverse(nums.begin(), nums.end());
+}
+//1356 按数字对应二进制下1的数量，做升序排序
+vector<int> GraphBasic::sortByBits1356(vector<int>& arr){
+    sort(arr.begin(),arr.end(),cmp1356);
+    return arr;
+}
+int GraphBasic::bitCount1356(int n) { // 计算n的二进制中1的数量
+            int count = 0;
+            while(n) {
+                n &= (n -1); // 清除最低位的1,是从左到右的最低位，不是最末位；有几个1就循环几次
+                count++;
+            }
+            return count;
+}
+bool GraphBasic::cmp1356(int a, int b) {
+            int bitA = bitCount1356(a);
+            int bitB = bitCount1356(b);
+            if (bitA == bitB) return a < b; // 如果bit中1数量相同，比较数值大小
+            return bitA < bitB; // 否则比较bit中1数量大小
 }
