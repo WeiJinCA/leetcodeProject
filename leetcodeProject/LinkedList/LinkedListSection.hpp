@@ -35,7 +35,17 @@ public:
     ListNode *getIntersectionNode(ListNode *headA, ListNode *headB);
     
     //环链表
-    ListNode *detectCycle(ListNode *head);
+    //141探测环形链表 ， 代码在142种，快慢指针法
+    ListNode *detectCycle(ListNode *head);//142
+    
+    //回文链表
+    bool isPalindrome234(ListNode* head);
+    ListNode* reverseList234(ListNode* head);
+    
+    //143
+    void reorderListWithDeque(ListNode* head);
+    void reorderList143_3(ListNode* head);
+    ListNode* reverseListHelper143(ListNode* head);
     
     
 };

@@ -27,7 +27,7 @@ int ArraySection::binarySearch(vector<int>& nums, int target) {
         return -1;
 }
 
-//35
+//35 此处用的左闭右开区间
 int ArraySection::searchInsert(vector<int>& nums, int target){
     int left = 0;
     int right = static_cast<int>(nums.size()) ;//强制转换为int
@@ -162,7 +162,7 @@ void ArraySection::moveZeroes(vector<int>& nums){
         }
     }
 }
-
+//844
 bool ArraySection::backspaceCompare(string s, string t){
     string x="",y="";
     for(int i=0;i<s.size();i++){
@@ -179,6 +179,39 @@ bool ArraySection::backspaceCompare(string s, string t){
     
     if(x == y) return true;
     else return false;
+}
+//844第二种解法：从后向前遍历S和T（i初始为S末尾，j初始为T末尾），记录#的数量，模拟消除的操作，如果#用完了，就开始比较S[i]和S[j]
+bool ArraySection::backspaceCompare_v2(string s, string t){
+    int sSkipNum = 0;//记录S的#数量
+    int tSkipNum = 0;//记录t的#数量
+    int i = static_cast<int>(s.size())  - 1;
+    int j = static_cast<int>(t.size())  - 1;
+    while(1){
+        while(i >= 0){// 从后向前，消除S的#
+            if(s[i] == '#') sSkipNum++;
+            else{
+                if(sSkipNum > 0) sSkipNum--;
+                else break;
+            }
+            i--;
+        }
+        while(j >= 0){// 从后向前，消除t的#
+            if(t[i] == '#') tSkipNum++;
+            else{
+                if(tSkipNum > 0) tSkipNum--;
+                else break;
+            }
+            j--;
+        }
+        //如果#号数量用完，就开始比较字符是否相等
+        if(i < 0 || j < 0) break;//遍历到头了
+        if(s[i] != t[j]) return false;
+        i--;j--;
+    }
+    
+    //说明同时遍历完字符串
+    if(i == -1 && j == -1) return true;
+    return false;
 }
 
 vector<int> ArraySection::sortedSquares(vector<int>& A){
@@ -413,4 +446,134 @@ int ArraySection::minDifference(const vector<vector<int>>& vec, int n, int m){
     }
     
     return result;
+}
+//1365: 有多少小于当前数字元素的数字
+//思路：对数字排序，下标即表示之前有多少数字小于当前数字
+vector<int> ArraySection::smallerNumbersThanCurrent(vector<int>& nums){
+    vector<int> vec = nums;
+    sort(vec.begin(), vec.end()); // 从小到大排序之后，元素下标就是小于当前数字的数字
+    int hash[101];
+    for (int i = static_cast<int>(vec.size()) - 1; i >= 0; i--) { // 从后向前，记录 vec[i] 对应的下标
+            hash[vec[i]] = i;//对于相同的数字，hash存储的是最左侧的数字
+    }
+    // 此时hash里保存的每一个元素数值 对应的 小于这个数值的个数
+    for (int i = 0; i < nums.size(); i++) {
+            vec[i] = hash[nums[i]];//将按nums顺序重新赋值
+    }
+    return vec;
+}
+//941 有效山脉数组：双指针法
+bool ArraySection::validMountainArray(vector<int>& arr){
+    if(arr.size() < 3) return false;
+    int left = 0;
+    int length = static_cast<int>(arr.size());
+    int right = length - 1;
+    
+    //防止指针越界
+    while(left < length - 1 && arr[left] < arr[left + 1]) left++;
+    while(right > 0 && arr[right] > arr[right - 1]) right--;
+    
+    //如果left或者right都在起始位置，说明不是山峰
+    if(left == right && left != 0 && right != arr.size() - 1) return true;
+    return false;
+}
+//1207 每个数组元素的出现次数都是独一无二，则返回true
+bool ArraySection::uniqueOccurrences(vector<int>& arr){
+    int count[2001] = {0};//统计数字出现的频率
+    for(int i = 0 ; i< arr.size();i++){
+        count[arr[i] + 1000]++;
+    }
+    
+    bool fre[1001] = {false};//看相同频率是否重复出现
+    for(int i = 0; i <= 2000;i++){
+        if(count[i]){
+            if(fre[count[i]] == false) fre[count[i]] = true;
+            else return false;
+        }
+    }
+    return true;
+}
+//283双指针法
+void ArraySection::moveZeroes283(vector<int>& nums){
+    int slowIndex = 0;
+    for(int fastIndex = 0 ; fastIndex < nums.size();fastIndex++){
+        if(nums[fastIndex] != 0) nums[slowIndex++] = nums[fastIndex];//不为0，就往前移
+    }
+    // 将slowIndex之后的冗余元素赋值为0
+    for (int i = slowIndex; i < nums.size(); i++) {
+        nums[i] = 0;
+    }
+}
+//189 旋转数组
+void ArraySection::rotate(vector<int>& nums, int k) {
+        k = k % nums.size();
+        reverse(nums.begin(), nums.end());
+        reverse(nums.begin(), nums.begin() + k);
+        reverse(nums.begin() + k, nums.end());
+
+    }
+int ArraySection::pivotIndex724(vector<int>& nums){
+    int sum = 0;
+            for (int num : nums) sum += num; // 求和
+            int leftSum = 0;    // 中心索引左半和
+            int rightSum = 0;   // 中心索引右半和
+            for (int i = 0; i < nums.size(); i++) {
+                leftSum += nums[i];
+                rightSum = sum - leftSum + nums[i];
+                if (leftSum == rightSum) return i;
+            }
+            return -1;
+}
+//34二分查找：左闭右闭
+int ArraySection::getRightBorder34(vector<int>& nums, int target){
+    int left = 0;
+    int right = static_cast<int>(nums.size()) - 1; // 定义target在左闭右闭的区间里，[left, right]
+    int rightBorder = -2; // 记录一下rightBorder没有被赋值的情况
+    while (left <= right) { // 当left==right，区间[left, right]依然有效
+            int middle = left + ((right - left) / 2);// 防止溢出 等同于(left + right)/2
+            if (nums[middle] > target) {
+                right = middle - 1; // target 在左区间，所以[left, middle - 1]
+            } else { // 当nums[middle] == target的时候，更新left，这样才能得到target的右边界
+                left = middle + 1;
+                rightBorder = left;
+            }
+        }
+    return rightBorder;
+}
+int ArraySection::getLeftBorder34(vector<int>& nums, int target){
+    int left = 0;
+    int right = static_cast<int>(nums.size()) - 1; // 定义target在左闭右闭的区间里，[left, right]
+    int leftBorder = -2; // 记录一下rightBorder没有被赋值的情况
+    while (left <= right) { // 当left==right，区间[left, right]依然有效
+            int middle = left + ((right - left) / 2);// 防止溢出 等同于(left + right)/2
+            if (nums[middle] >= target) {
+                right = middle - 1; // target 在左区间，所以[left, middle - 1]
+                leftBorder = right;
+            } else { // 当nums[middle] == target的时候，更新left，这样才能得到target的右边界
+                left = middle + 1;
+            }
+        }
+    return leftBorder;
+}
+//可参考二分查找中的34解法，利用helper一次找出左右边界
+vector<int> ArraySection::searchRange34(vector<int>& nums, int target) {
+        int leftBorder = getLeftBorder34(nums, target);
+        int rightBorder = getRightBorder34(nums, target);
+        // 情况一
+        if (leftBorder == -2 || rightBorder == -2) return {-1, -1};//target在左侧外部或右侧外部
+        // 情况三
+        if (rightBorder - leftBorder > 1) return {leftBorder + 1, rightBorder - 1};//找到了
+        // 情况二
+        return {-1, -1};//没有
+    }
+//922 按奇偶排序数组
+vector<int> sortArrayByParityII(vector<int>& nums){
+    int oddIndex =  1;
+    for(int i=0;i < nums.size();i += 2){
+        if(nums[i] % 2 == 1){
+            while(nums[oddIndex] % 2 != 0) oddIndex += 2;// 在奇数位找一个偶数
+            swap(nums[i], nums[oddIndex]);
+        }
+    }
+    return nums;
 }

@@ -108,6 +108,8 @@ public:
     vector<vector<int>> levelOrderForN(Node* root);//429 //N叉树
     vector<int> largestValues(TreeNode* root);//515
     Node1* connect(Node1* root);//116 / 117//填充每个节点的下一个右侧节点指针
+    Node1* connect116ByRecursion(Node1* root);
+    void traversal116ByRecursion(Node1* cur);
     int maxDepth104(TreeNode* root);//104
     int minDepth(TreeNode* root);//111
     
@@ -123,6 +125,7 @@ public:
     bool isSymmetricByIteration(TreeNode* root);
     bool isSameTree(TreeNode* p, TreeNode* q);//100 判断两个树是否相等
     bool isSameTreeByRecursion(TreeNode* p, TreeNode* q);//100 判断两个树是否相等
+    bool isSameTreeByIter(TreeNode* p, TreeNode* q);//100
     bool isSubtree(TreeNode* root, TreeNode* subRoot);//572 判断是否是树的子树
     //最大深度 类似104
     int maxDepth1(TreeNode* root);//
@@ -223,6 +226,15 @@ public:
     
     //32 将二叉搜索树转换为累加树 缺失
     
+    //额外题目部分
+    //129
+    int sumNumbers129(TreeNode* root);//求根节点到叶子节点的和
+    int vectorToInt(const vector<int>& vec);
+    void traversal129(TreeNode* cur);
     
+    //1382*
+    TreeNode* balanceBST1382(TreeNode* root);
+    void traversal1382(TreeNode* cur);
+    TreeNode* getTree1382(vector<int>& nums, int left, int right);
 };
 #endif /* BinaryTreeBasic_hpp */

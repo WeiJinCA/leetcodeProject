@@ -377,6 +377,23 @@ vector<int> BinaryTreeBasic::largestValues(TreeNode* root){
     
     return result;
 }
+//116 递归法
+BinaryTreeBasic::Node1* BinaryTreeBasic::connect116ByRecursion(Node1* root){
+    traversal116ByRecursion(root);
+    return root;
+}
+void BinaryTreeBasic::traversal116ByRecursion(Node1* cur){
+    if(cur == NULL) return;
+    
+    if(cur->left) cur->left->next = cur->right;// 操作1
+    if(cur->right){
+        if(cur->next) cur->right->next = cur->next->left;// 操作2
+        else cur->right->next = NULL;
+    }
+    traversal116ByRecursion(cur->left);//左
+    traversal116ByRecursion(cur->right);//右
+    
+}
 //116 对完整二叉树：填充每个节点的下一个右侧节点指针, 其初始为NULL
 //适用于117
 BinaryTreeBasic::Node1* BinaryTreeBasic::connect(BinaryTreeBasic::Node1* root){
@@ -571,6 +588,7 @@ bool BinaryTreeBasic::isSameTree(TreeNode* p, TreeNode* q){
             }
             return true;
 }
+//100 相同的树：结构相同，且节点具有相同的值
 bool BinaryTreeBasic::isSameTreeByRecursion(TreeNode* p, TreeNode* q){
     if (p == NULL && q == NULL) {
         return true;
@@ -582,6 +600,33 @@ bool BinaryTreeBasic::isSameTreeByRecursion(TreeNode* p, TreeNode* q){
         return isSameTreeByRecursion(p->left,q->left) && isSameTreeByRecursion(p->right,q->right);
     }else return false;
 }
+//迭代法
+bool BinaryTreeBasic::isSameTreeByIter(TreeNode* p, TreeNode* q){
+    if (p == NULL && q == NULL) return true;
+    if (p == NULL || q == NULL) return false;
+    queue<TreeNode*> que;
+    que.push(p);   //  添加根节点p
+    que.push(q);  //  添加根节点q
+    
+    while(!que.empty()){
+        TreeNode* leftNode = que.front();que.pop();
+        TreeNode* rightNode = que.front();que.pop();
+        if(!leftNode && !rightNode){
+            continue;
+        }
+        
+        // 若p的节点与q的节点有一个为空或p的节点的值与q节点不同
+        if ((!leftNode || !rightNode || (leftNode->val != rightNode->val))) {
+            return false;
+        }
+        que.push(leftNode->left);   // 添加p节点的左子树节点
+        que.push(rightNode->left); // 添加q节点的左子树节点
+        que.push(leftNode->right);  // 添加p节点的右子树节点
+        que.push(rightNode->right);  // 添加q节点的右子树节点
+    }
+    return  true;
+}
+
 //572 判断是否是树的子树
 bool BinaryTreeBasic::isSubtree(TreeNode* root, TreeNode* subRoot){
     if (root == NULL) {
@@ -1121,7 +1166,7 @@ int BinaryTreeBasic::getMinimumDifference(TreeNode* root){
                     cur = cur->right;               // 右
                 }
             }
-            return true;
+    return true;
 }
 //501 找出现频率最高的
 // 如果众数超过1个，不需考虑输出顺序
@@ -1384,4 +1429,62 @@ BinaryTreeBasic::TreeNode* BinaryTreeBasic::sortedArrayToBSTByIter(vector<int>& 
                 }
             }
             return root;
+}
+//129 各节点的值在0-9之间，返回所有从根节点到叶子节点的总和，路径各数字组成个十百位，依次类推
+int BinaryTreeBasic::sumNumbers129(TreeNode* root){
+    path.clear();
+    if (root == nullptr) return 0;
+    path.push_back(root->val);
+    traversal129(root);
+    return result;
+}
+//累加path的值
+int BinaryTreeBasic::vectorToInt(const vector<int>& vec) {
+        int sum = 0;
+        for (int i = 0; i < vec.size(); i++) {
+            sum = sum * 10 + vec[i];
+        }
+        return sum;
+}
+void BinaryTreeBasic::traversal129(TreeNode* cur) {
+        if (!cur->left && !cur->right) { // 遇到了叶子节点
+            result += vectorToInt(path);
+            return;
+        }
+
+        if (cur->left) { // 左 （空节点不遍历）
+            path.push_back(cur->left->val);     // 处理节点
+            traversal129(cur->left);               // 递归
+            path.pop_back();                    // 回溯，撤销
+        }
+        if (cur->right) { // 右 （空节点不遍历）
+            path.push_back(cur->right->val);    // 处理节点
+            traversal129(cur->right);              // 递归
+            path.pop_back();                    // 回溯，撤销
+        }
+        return ;
+}
+//1382 将二叉搜索树变平衡
+//思路：可以中序遍历把二叉树转变为有序数组，然后在根据有序数组构造平衡二叉搜索树
+BinaryTreeBasic::TreeNode* BinaryTreeBasic::balanceBST1382(TreeNode* root){
+    traversal1382(root);
+    return getTree1382(vec, 0, vec.size() - 1);
+}
+// 有序树转成有序数组
+void BinaryTreeBasic::traversal1382(TreeNode* cur){
+    if(cur == nullptr){
+        return;
+    }
+    traversal1382(cur->left);
+    vec.push_back(cur->val);
+    traversal1382(cur->right);
+}
+// 有序数组转平衡二叉树
+BinaryTreeBasic::TreeNode* BinaryTreeBasic::getTree1382(vector<int>& nums, int left, int right){
+    if(left > right) return nullptr;
+    int mid = left + ((right - left) / 2);
+    TreeNode* root = new TreeNode(nums[mid]);
+    root->left = getTree1382(nums, left, mid-1);
+    root->right = getTree1382(nums, mid + 1, right);
+    return root;
 }

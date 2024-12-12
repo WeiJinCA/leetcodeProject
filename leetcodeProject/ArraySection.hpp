@@ -27,6 +27,7 @@ public:
     int removeDuplicates(vector<int>& nums);//26
     void moveZeroes(vector<int>& nums);//283
     bool backspaceCompare(string s, string t);//844 含退格字符，比较字符串
+    bool backspaceCompare_v2(string s, string t);//844 含退格字符，比较字符串
     vector<int> sortedSquares(vector<int>& A);//977 平方后有序
     
     //长度最小的子数组
@@ -43,6 +44,21 @@ public:
     //开发商买土地
     int minDifference(const vector<vector<int>>& vec, int n, int m);
     
+    //1365有多少小于当前数字的数字
+    vector<int> smallerNumbersThanCurrent(vector<int>& nums);
+    
+    //941
+    bool validMountainArray(vector<int>& arr);
+    //1207
+    bool uniqueOccurrences(vector<int>& arr);
+    //283
+    void moveZeroes283(vector<int>& nums);
+    void rotate(vector<int>& nums, int k);//189
+    int pivotIndex724(vector<int>& nums);
+    int getRightBorder34(vector<int>& nums, int target);
+    int getLeftBorder34(vector<int>& nums, int target);
+    vector<int> searchRange34(vector<int>& nums, int target);
+    vector<int> sortArrayByParityII(vector<int>& nums);//922
     
     
 };

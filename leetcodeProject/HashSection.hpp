@@ -41,7 +41,15 @@ public:
     bool canConstruct(string ransomNote, string magazine);
     vector<vector<int>> threeSum(vector<int>& nums);//三数之和 15
     vector<vector<int>> threeSumByHash(vector<int>& nums);//三数之和 15 by 哈希法
-    vector<vector<int>> fourSum(vector<int>& nums, int target);//18.四数之和 
+    vector<vector<int>> fourSum(vector<int>& nums, int target);//18.四数之和
+    
+    //同构字符串
+    bool isIsomorphic(string s, string t);
+    //查找常用字符
+    vector<string> commonChars(vector<string>& words);//1002*
+    //
+    bool isLongPressedName(string name, string typed);//925
+    
     
 };
 #endif /* HashSection_hpp */

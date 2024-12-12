@@ -190,3 +190,131 @@ ListNode *LinkedListSection::detectCycle(ListNode *head){
     }
     return NULL;
 }
+//234
+//思路1：将链表转换为数组，然后双指针判断数组首尾是否相同
+//思路2:将链表后半部分反转，然后和前半部分比较；
+//思路2步骤：用快慢指针找出中间节点；用pre记录中间节点的前一个节点用于分割；反转后半部分；比较两部分
+bool LinkedListSection::isPalindrome234(ListNode* head){
+    if(head == nullptr || head->next == nullptr) return true;
+    ListNode* slow = head;//慢指针，找到链表中间部分，作为分割
+    ListNode* fast = head;//慢指针，找到链表中间部分，作为分割
+    ListNode* pre = head;//慢指针，找到链表中间部分，作为分割
+    while(fast && fast->next){
+        pre = slow;
+        slow = slow->next;
+        fast = fast->next->next;
+    }
+    pre->next = nullptr;//分割链表
+    
+    ListNode* cur1 = head;
+    ListNode* cur2 = reverseList(slow);//反转后半部分
+    
+    //比较两个部分
+    while(cur1){
+        if(cur1->val != cur2->val) return false;
+        cur1 = cur1->next;
+        cur2 = cur2->next;
+    }
+    return true;
+}
+// 反转链表
+ListNode* LinkedListSection::reverseList234(ListNode* head){
+    ListNode* temp;//保存cur的下一个节点
+    ListNode* cur = head;
+    ListNode* pre = nullptr;
+    
+    while(cur){
+        temp = cur->next;// 保存一下 cur的下一个节点，因为接下来要改变cur->next
+        cur->next = pre;//反转操作
+        pre = cur;
+        cur = temp;
+    }
+    
+    return pre;
+}
+//143
+//方法二：使用双向队列
+void LinkedListSection::reorderListWithDeque(ListNode* head){
+    deque<ListNode*> que;
+    ListNode* cur = head;
+    if(cur == nullptr) return;
+    
+    while(cur->next != nullptr){
+        que.push_back(cur->next);
+        cur = cur->next;
+    }
+    
+    cur = head;
+    int count = 0;//偶数取后面，奇数取前面
+    ListNode* node;
+    while(que.size()){
+        if(count %2 == 0){
+            node = que.back();
+            que.pop_back();
+        }else{
+            node = que.front();
+            que.pop_back();
+        }
+        count++;
+        cur->next = node;
+        cur = cur->next;
+    }
+}
+//143方法三：链表拼接：将链表分割成两个链表，然后把第二个链表反转，之后在通过两个链表拼接成新的链表
+void LinkedListSection::reorderList143_3(ListNode* head){
+    if(head == nullptr) return ;
+    
+    // 使用快慢指针法，将链表分成长度均等的两个链表head1和head2
+    // 如果总链表长度为奇数，则head1相对head2多一个节点
+    ListNode* fast = head;
+    ListNode* slow = head;
+    while(fast && fast->next && fast->next->next){
+        fast = fast->next->next;
+        slow = slow->next;
+    }
+    
+    ListNode* head1 = head;
+    ListNode* head2;
+    head2 = slow->next;//后半部分的头
+    slow->next = nullptr;
+    
+    // 对head2进行翻转
+    head2 = reverseListHelper143(head2);
+    
+    // 将head1和head2交替生成新的链表head
+    ListNode* cur1 = head1;
+    ListNode* cur2 = head2;
+    ListNode* cur = head;
+    cur1 = cur1->next;
+    int count = 0;// 偶数取head2的元素，奇数取head1的元素
+    while(cur1 && cur2){
+        if(count %2 == 0){
+            cur->next = cur2;
+            cur2 = cur2->next;
+        }else{
+            cur->next = cur1;
+            cur1 = cur1->next;
+        }
+        count++;
+        cur = cur->next;
+    }
+    if (cur2 != nullptr) { // 处理结尾
+        cur->next = cur2;
+            }
+    if (cur1 != nullptr) {
+        cur->next = cur1;
+    }
+}
+// 反转链表
+ListNode* LinkedListSection::reverseListHelper143(ListNode* head){
+    ListNode* temp;
+    ListNode* cur = head;
+    ListNode* pre = NULL;
+    while(cur){
+        temp = cur->next;
+        cur->next = pre;//翻转
+        pre = cur;
+        cur = temp;
+    }
+    return pre;
+}

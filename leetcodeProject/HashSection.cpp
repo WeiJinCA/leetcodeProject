@@ -9,6 +9,7 @@
 #include <iostream>
 #include <string>
 #include <unordered_set>
+#include <unordered_map>
 
 using namespace std;
 
@@ -310,4 +311,81 @@ vector<vector<int>> HashSection::fourSum(vector<int>& nums, int target){
     }
     
     return res;
+}
+//205 两个字符串的字符是否以相同的映射关系一一对应
+//使用两个map 保存 s[i] 到 t[j] 和 t[j] 到 s[i] 的映射关系，如果发现对应不上，立刻返回 false
+bool HashSection::isIsomorphic(string s, string t){
+    unordered_map<char, char> map1;
+    unordered_map<char, char> map2;
+    
+    for(int i = 0, j =0; i < s.size();i++,j++){
+        if(map1.find(s[i]) == map1.end()){
+            map1[s[i]] = t[j];
+        }
+        
+        if(map2.find(t[j]) == map2.end()){
+            map2[t[j]] = s[i];
+        }
+        
+        if(map1[s[i]] != t[j] || map2[t[j]] != s[i])return false;
+    }
+    return true;
+}
+//1002 找出字符串数组中每个字符串都共用的字符，返回数组
+//思路：统计出搜索字符串里26个字符的出现的频率，然后取每个字符频率最小值，最后转成输出格式就可以了。
+vector<string> HashSection::commonChars(vector<string>& words){
+    vector<string> result;
+    if(words.size() == 0) return result;
+    int hash[26] = {0};// 用来统计所有字符串里字符出现的最小频率
+    for(int i = 0; i < words[0].size();i++){
+        hash[words[0][i] - 'a']++;
+    }
+    
+    int hashOtherStr[26] = {0}; // 统计除第一个字符串外字符的出现频率
+            for (int i = 1; i < words.size(); i++) {
+                memset(hashOtherStr, 0, 26 * sizeof(int));
+                for (int j = 0; j < words[i].size(); j++) {
+                    hashOtherStr[words[i][j] - 'a']++;
+                }
+                // 更新hash，保证hash里统计26个字符在所有字符串里出现的最小次数
+                for (int k = 0; k < 26; k++) {
+                    hash[k] = min(hash[k], hashOtherStr[k]);
+                }
+            }
+            // 将hash统计的字符次数，转成输出形式
+            for (int i = 0; i < 26; i++) {
+                while (hash[i] != 0) { // 注意这里是while，多个重复的字符
+                    string s(1, i + 'a'); // char -> string
+                    result.push_back(s);
+                    hash[i]--;
+                }
+            }
+
+            return result;
+}
+//925 长按键入
+//时间复杂度：O(n) 空间复杂度：O(1)
+bool HashSection::isLongPressedName(string name, string typed){
+    int i = 0, j= 0;
+    while(i < name.size() && j < typed.size()){
+        if(name[i] == typed[j]){
+            i++;j++;
+        }else{//不相同
+            if(j == 0) return false;//如果第一位都不同，直接返回false
+            //跨越重复项
+            while(j < typed.size() && typed[j] == typed[j - 1]) j++;
+            if(name[i] == typed[j]){
+                i++;j++;
+            }
+            else return false;
+        }
+    }
+    if(i < name.size()) return false;
+    
+    //如果typed没匹配完
+    while(j < typed.size()){
+        if(typed[j] == typed[j - 1]) j++;
+        else return false;
+    }
+    return true;
 }
