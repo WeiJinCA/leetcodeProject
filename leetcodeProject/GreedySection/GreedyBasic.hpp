@@ -64,6 +64,9 @@ public:
     //23
     int minCameraCover(TreeNode* root);//968
     int traversalHelper(TreeNode* cur);
+    //649**
+    string predictPartyVictory(string senate);//649 dota2参议院
+    int balancedStringSplit1221(string s);//1221
     
     
 };

@@ -317,3 +317,46 @@ int GreedyBasic::traversalHelper(TreeNode* cur){
         return 1;// 情况2：左右节点至少有一个无覆盖的情况，要放摄像头
     }else return 2;//情况3：左右节点至少有一个有摄像头，父节点是覆盖状态
 }
+//649 dota2参议院
+//消灭的策略是，尽量消灭自己后面的对手，因为前面的对手已经使用过权利了，而后序的对手依然可以使用权利消灭自己的同伴！
+//局部最优：有一次权利机会，就消灭自己后面的对手。全局最优：为自己的阵营赢取最大利益
+//技巧，就是用一个变量记录当前参议员之前有几个敌对对手了，进而判断自己是否被消灭了。这个变量我用flag来表示。
+string GreedyBasic::predictPartyVictory(string senate){
+    // R = true表示本轮循环结束后，字符串里依然有R。D同理
+    bool R = true, D = true;
+    // 当flag大于0时，R在D前出现，R可以消灭D。当flag小于0时，D在R前出现，D可以消灭R
+    int flag = 0;
+    
+    while(R && D){// 一旦R或者D为false，就结束循环，说明本轮结束后只剩下R或者D了
+        D = false;
+        R = false;
+        for (int i = 0; i < senate.size(); i++) {
+            if(senate[i] == 'R'){
+                if(flag < 0) senate[i] = 0;// 消灭R，R此时为false
+                else R = true;// 如果没被消灭，本轮循环结束有R
+                flag++;
+            }
+            if (senate[i] == 'D') {
+                if (flag > 0) senate[i] = 0;
+                else D = true;
+                flag--;
+            }
+        }
+    }
+    
+    // 循环结束之后，R和D只能有一个为true
+    return R == true ? "Radiant" : "Dire";
+}
+//1221 分割平衡字符串：分割得到尽可能多的平衡字符串
+//平衡字符串：L,R的数量是相同的
+//从前向后遍历，只要遇到平衡子串，计数就+1，遍历一遍即可。局部最优：从前向后遍历，只要遇到平衡子串 就统计；全局最优：统计了最多的平衡子串
+int GreedyBasic::balancedStringSplit1221(string s){
+    int result = 0;
+    int count =0;
+    for (int i = 0; i<s.size(); i++) {
+        if(s[i] == 'R') count++;
+        else count--;
+        if (count == 0) result++;
+    }
+    return result;
+}

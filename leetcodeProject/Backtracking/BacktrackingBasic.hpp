@@ -96,7 +96,7 @@ public:
     vector<string> findItinerary(vector<vector<string>>& tickets);//332**
     bool backtracking332(int ticketNum, vector<string>& result);
     //20 N皇后问题
-    vector<vector<string>> solveNQueens(int n);//51
+    vector<vector<string>> solveNQueens(int n);//51 //52
     void backtracking51(int n, int row, vector<string>& chessboard);
     bool isValid51(int row, int col, vector<string>& chessboard, int n);
     //21解数独
